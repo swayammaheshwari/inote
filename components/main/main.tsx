@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import VoiceBubble from "@/components/VoiceBubble/voicebubble";
 
-export default function Main() {
+const SpeechHandler: React.FC = () => {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
 
@@ -26,7 +27,8 @@ export default function Main() {
   const startListening = () => {
     // Check if the browser supports SpeechRecognition
     const SpeechRecognition =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
+      (window as any).SpeechRecognition ||
+      (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
       console.error("SpeechRecognition is not supported in this browser.");
@@ -43,13 +45,13 @@ export default function Main() {
       console.log("Listening for user input...");
     };
 
-    recognition.onresult = (event) => {
+    recognition.onresult = (event: any) => {
       const result = event.results[0][0].transcript; // Extract transcript
       console.log("User said:", result);
       setTranscript(result);
     };
 
-    recognition.onerror = (event) => {
+    recognition.onerror = (event: any) => {
       console.error("SpeechRecognition error:", event.error);
     };
 
@@ -62,26 +64,10 @@ export default function Main() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
-      {/* Thought Bubble Animation */}
-      <div className="relative flex items-center justify-center h-40 w-40">
-        <div className="absolute h-20 w-20 bg-white rounded-full animate-pulse"></div>
-        <div className="absolute h-32 w-32 bg-white rounded-full animate-bounce"></div>
-        <div className="absolute h-40 w-40 bg-white rounded-full"></div>
-      </div>
-
-      {/* Button Controls */}
-      <div className="mt-8 flex space-x-4">
-        <button
-          onClick={startSpeaking}
-          className="p-4 bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          🎤
-        </button>
-      </div>
-
+    <div>
+      <VoiceBubble onSpeak={startSpeaking} />
       {/* Display Transcription */}
-      <div className="mt-4 text-gray-400">
+      <div className="mt-4 text-center text-gray-400">
         {isListening ? (
           <p>Listening...</p>
         ) : (
@@ -90,4 +76,6 @@ export default function Main() {
       </div>
     </div>
   );
-}
+};
+
+export default SpeechHandler;
